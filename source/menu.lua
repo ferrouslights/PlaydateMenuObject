@@ -4,19 +4,20 @@ import "CoreLibs/sprites"
 import "Choice"
 
 local mainMenuChoices = {
-	Choice(true, "start"),
-	Choice(true, "pause"),
-	Choice(true, "end game")
+	3,
+	Choice(true, "start"), 		--1 
+	Choice(true, "pause"), 		--2
+	Choice(true, "end game") 	--3
 }
 
 class('Menu', {
 	enabled = true, 		-- if the user is allowed to interact
 	title = "", 			-- menu title
 	cursor = nil, 			-- cursor object for rendering
-	cursorPosition = 0, 	-- top of the menu in the list
+	cursorPosition = 1, 	-- top of the menu in the list
 	choices = {},			-- list of choices
 	movementCooldown = 10,	-- how long in frames does the menu cool down before allowing nav again
-	movementCooldownCounter = 0		-- counter for checking when cooldown is over
+	movementCooldownCounter = 0,		-- counter for checking when cooldown is over
 }).extends()
 
 function Menu:init(enabled, title, cursor, choices)
@@ -26,9 +27,7 @@ function Menu:init(enabled, title, cursor, choices)
 	self.enabled = enabled
 	self.title = title
 	self.cursor = cursor
-	if (choices == "main") then
-		self.choices = mainMenuChoices
-	end
+	self.choices = mainMenuChoices
 end
 
 function Menu:spawn(x,y)
@@ -56,18 +55,25 @@ function Menu:listenForInput()
 	end
 		
 	if playdate.buttonIsPressed( playdate.kButtonUp ) then
-		-- self.moveCursor(1)
+		self:moveCursor(1)
 		self:incrementCounter()
 		print("up pressed")
 		return
 	end
 	
 	if playdate.buttonIsPressed( playdate.kButtonDown ) then
-		-- self.moveCursor(-1)
+		self:moveCursor(-1)
 		self:incrementCounter()
 		print("down pressed")
 		return
 	end
+end
+
+function Menu:update()
+	playdate.graphics.clear()
+	self.cursor = playdate.graphics.drawText("*" .. self.cursorPosition .. "*", 200, 120)
+	
+	self:listenForInput()
 end
 
 function Menu:incrementCounter()
@@ -79,9 +85,20 @@ function Menu:resetCounter()
 end
 
 function Menu:moveCursor(direction)
+	length = 3
 	if (direction > 0) then
+		if (self.cursorPosition + 1 > length) then
+			self.cursorPosition = 1
+		else
+			self.cursorPosition += 1
+		end
 		print("moving cursor up")
 	else
+		if (self.cursorPosition - 1 < 1) then
+			self.cursorPosition = length
+		else
+			self.cursorPosition -= 1
+		end
 		print("moving cursor down")
 	end
 end
