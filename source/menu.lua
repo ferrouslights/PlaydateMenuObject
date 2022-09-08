@@ -14,7 +14,9 @@ class('Menu', {
 	title = "", 			-- menu title
 	cursor = nil, 			-- cursor object for rendering
 	cursorPosition = 0, 	-- top of the menu in the list
-	choices = {} 			-- list of choices
+	choices = {},			-- list of choices
+	movementCooldown = 10,	-- how long in frames does the menu cool down before allowing nav again
+	movementCooldownCounter = 0		-- counter for checking when cooldown is over
 }).extends()
 
 function Menu:init(enabled, title, cursor, choices)
@@ -43,22 +45,41 @@ function Menu:listenForInput()
 	if (self.enabled == false) then
 		return
 	end
+	
+	if (self.movementCooldownCounter > 0) then
+		if (self.movementCooldownCounter < self.movementCooldown) then
+			self:incrementCounter()
+			return
+		else
+			self:resetCounter()
+		end
+	end
 		
 	if playdate.buttonIsPressed( playdate.kButtonUp ) then
-		self.moveCursor(true)
+		-- self.moveCursor(1)
+		self:incrementCounter()
 		print("up pressed")
 		return
 	end
 	
 	if playdate.buttonIsPressed( playdate.kButtonDown ) then
-		self.moveCursor(false)
+		-- self.moveCursor(-1)
+		self:incrementCounter()
 		print("down pressed")
 		return
 	end
 end
 
-function Menu:moveCursor(isUp)
-	if (isUp) then
+function Menu:incrementCounter()
+	self.movementCooldownCounter += 1
+end
+
+function Menu:resetCounter()
+	self.movementCooldownCounter = 0
+end
+
+function Menu:moveCursor(direction)
+	if (direction > 0) then
 		print("moving cursor up")
 	else
 		print("moving cursor down")

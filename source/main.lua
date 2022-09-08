@@ -24,7 +24,7 @@ local menu = nil
 -- A function to set up our game environment.
 
 function myGameSetUp()
-	menu = Menu(false, "main title", nil, "main")
+	menu = Menu(true, "main title", nil, "main")
 	-- We want an environment displayed behind our sprite.
 	-- There are generally two ways to do this:
 	-- 1) Use setBackgroundDrawingCallback() to draw a background image. (This is what we're doing below.)
